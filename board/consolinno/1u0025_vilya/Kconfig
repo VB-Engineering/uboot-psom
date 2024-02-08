@@ -1,0 +1,15 @@
+if TARGET_1U0025_VILYA
+
+config SYS_BOARD
+	default "1u0025_vilya"
+
+config SYS_VENDOR
+	default "consolinno"
+
+config SYS_CONFIG_NAME
+	default "1u0025_vilya"
+
+config IMX_CONFIG
+	default "board/consolinno/1u0025_vilya/1u0025_vilya.cfg"
+
+endif

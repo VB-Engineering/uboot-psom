@@ -1,0 +1,6 @@
+1U0025_VILYA
+M:	Paul Budich <p.budich@consolinno.de>
+S:	Maintained
+F:	board/consolinno/1u0025_vilya/
+F:	include/configs/1u0025_vilya.h
+F:	configs/1u0025_vilya_defconfig
