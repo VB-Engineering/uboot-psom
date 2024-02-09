@@ -448,6 +448,13 @@ config TARGET_LIBREM5
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_1U0025_VILYA
+	bool "Consolinno 1U0025_VILYA EVK Board"
+	select BINMAN
+	select IMX8MM
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
 endchoice
 
 source "board/advantech/imx8mp_rsb3720a1/Kconfig"
@@ -481,5 +488,6 @@ source "board/technexion/pico-imx8mq/Kconfig"
 source "board/variscite/imx8mn_var_som/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/toradex/verdin-imx8mp/Kconfig"
+source "board/consolinno/1u0025_vilya/Kconfig"
 
 endif
