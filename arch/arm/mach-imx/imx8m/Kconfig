@@ -455,6 +455,16 @@ config TARGET_1U0025_VILYA
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_CONSOLINNO_1U0025
+	bool "Consolinno 1u0025"
+	select BINMAN
+	select IMX8MM
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
 endchoice
 
 source "board/advantech/imx8mp_rsb3720a1/Kconfig"
@@ -489,5 +499,6 @@ source "board/variscite/imx8mn_var_som/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/toradex/verdin-imx8mp/Kconfig"
 source "board/consolinno/1u0025_vilya/Kconfig"
+source "board/consolinno/1u0025/Kconfig"
 
 endif

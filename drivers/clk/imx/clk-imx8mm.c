@@ -17,7 +17,6 @@
 
 static const char *pll_ref_sels[] = { "clock-osc-24m", "dummy", "dummy", "dummy", };
 static const char *dram_pll_bypass_sels[] = {"dram_pll", "dram_pll_ref_sel", };
-static const char *video_pll1_bypass_sels[] = {"video_pll1", "video_pll1_ref_sel", };
 static const char *arm_pll_bypass_sels[] = {"arm_pll", "arm_pll_ref_sel", };
 static const char *sys_pll1_bypass_sels[] = {"sys_pll1", "sys_pll1_ref_sel", };
 static const char *sys_pll2_bypass_sels[] = {"sys_pll2", "sys_pll2_ref_sel", };
@@ -30,30 +29,6 @@ static const char *imx8mm_ahb_sels[] = {"clock-osc-24m", "sys_pll1_133m", "sys_p
 					"sys_pll2_125m", "sys_pll3_out", "audio_pll1_out", "video_pll1_out", };
 
 #ifndef CONFIG_SPL_BUILD
-static const char *imx8mm_disp_axi_sels[] = {"clock-osc-24m", "sys_pll2_1000m", "sys_pll1_800m", "sys_pll3_out",
-                         "sys_pll1_40m", "audio_pll2_out", "clk_ext1", "clk_ext4", };
-
-static const char *imx8mm_disp_apb_sels[] = {"clock-osc-24m", "sys_pll2_125m", "sys_pll1_800m", "sys_pll3_out",
-                         "sys_pll1_40m", "audio_pll2_out", "clk_ext1", "clk_ext3", };
-
-static const char *imx8mm_disp_dc8000_sels[] = {"clock-osc-24m", "dummy", "sys_pll1_800m", "sys_pll2_1000m",
-                         "sys_pll1_160m", "video_pll1_out", "sys_pll3_out", "audio_pll2_out", };
-static const char *imx8mm_disp_rtrm_sels[] = {"clock-osc-24m", "sys_pll1_800m", "sys_pll2_200m", "sys_pll2_1000m",
-                         "audio_pll1_out", "video_pll1_out", "clk_ext2", "clk_ext3", };
-
-
-static const char *imx8mm_lcdif_pixel_sels[] = {"clock-osc-24m", "video_pll1_out", "audio_pll2_out", "audio_pll1_out",
-                         "sys_pll1_800m", "sys_pll2_1000m", "sys_pll3_out", "clk_ext4", };
-
-static const char *imx8mm_dsi_core_sels[] = {"clock-osc-24m", "sys_pll1_266m", "sys_pll2_250m", "sys_pll1_800m",
-                         "sys_pll2_1000m", "sys_pll3_out", "audio_pll2_out", "video_pll1_out", };
-
-static const char *imx8mm_dsi_phy_sels[] = {"clock-osc-24m", "sys_pll2_125m", "sys_pll2_100m", "sys_pll1_800m",
-                         "sys_pll2_1000m", "clk_ext2", "audio_pll2_out", "video_pll1_out", };
-
-static const char *imx8mm_dsi_dbi_sels[] = {"clock-osc-24m", "sys_pll1_266m", "sys_pll2_100m", "sys_pll1_800m",
-                         "sys_pll2_1000m", "sys_pll3_out", "audio_pll2_out", "video_pll1_out", };
-
 static const char *imx8mm_enet_axi_sels[] = {"clock-osc-24m", "sys_pll1_266m", "sys_pll1_800m", "sys_pll2_250m",
 					     "sys_pll2_200m", "audio_pll1_out", "video_pll1_out", "sys_pll3_out", };
 
@@ -69,9 +44,6 @@ static const char *imx8mm_enet_phy_sels[] = {"clock-osc-24m", "sys_pll2_50m", "s
 
 static const char *imx8mm_nand_usdhc_sels[] = {"clock-osc-24m", "sys_pll1_266m", "sys_pll1_800m", "sys_pll2_200m",
 					       "sys_pll1_133m", "sys_pll3_out", "sys_pll2_250m", "audio_pll1_out", };
-
-static const char *imx8mm_nand_sels[] = {"clock-osc-24m", "sys_pll2_500m", "audio_pll1_out", "sys_pll1_400m",
-					 "audio_pll2_out", "sys_pll3_out", "sys_pll2_250m", "video_pll1_out", };
 
 static const char *imx8mm_usb_bus_sels[] = {"clock-osc-24m", "sys_pll2_500m", "sys_pll1_800m", "sys_pll2_100m",
 					    "sys_pll2_200m", "clk_ext2", "clk_ext4", "audio_pll2_out", };
@@ -136,28 +108,12 @@ static const char *imx8mm_ecspi3_sels[] = {"clock-osc-24m", "sys_pll2_200m", "sy
 					   "sys_pll1_800m", "sys_pll3_out", "sys_pll2_250m", "audio_pll2_out", };
 #endif
 
-#ifndef CONFIG_SPL_BUILD
-static unsigned int share_count_disp;
-#endif
-static u32 share_count_nand;
-
 static int imx8mm_clk_probe(struct udevice *dev)
 {
 	void __iomem *base;
-	struct clk osc_24m_clk;
-	int ret;
 
 	base = (void *)ANATOP_BASE_ADDR;
 
-	ret = clk_get_by_name(dev, "osc_24m", &osc_24m_clk);
-	if (ret)
-		return ret;
-
-	clk_dm(IMX8MM_CLK_24M, dev_get_clk_ptr(osc_24m_clk.dev));
-
-	clk_dm(IMX8MM_VIDEO_PLL1_REF_SEL,
-	       imx_clk_mux("video_pll1_ref_sel", base + 0x28, 0, 2,
-			   pll_ref_sels, ARRAY_SIZE(pll_ref_sels)));
 	clk_dm(IMX8MM_DRAM_PLL_REF_SEL,
 	       imx_clk_mux("dram_pll_ref_sel", base + 0x50, 0, 2,
 			   pll_ref_sels, ARRAY_SIZE(pll_ref_sels)));
@@ -174,9 +130,6 @@ static int imx8mm_clk_probe(struct udevice *dev)
 	       imx_clk_mux("sys_pll3_ref_sel", base + 0x114, 0, 2,
 			   pll_ref_sels, ARRAY_SIZE(pll_ref_sels)));
 
-	clk_dm(IMX8MM_VIDEO_PLL1,
-	       imx_clk_pll14xx("video_pll1", "video_pll1_ref_sel",
-			       base + 0x28, &imx_1443x_pll));
 	clk_dm(IMX8MM_DRAM_PLL,
 	       imx_clk_pll14xx("dram_pll", "dram_pll_ref_sel",
 			       base + 0x50, &imx_1443x_dram_pll));
@@ -194,11 +147,6 @@ static int imx8mm_clk_probe(struct udevice *dev)
 			       base + 0x114, &imx_1416x_pll));
 
 	/* PLL bypass out */
-	clk_dm(IMX8MM_VIDEO_PLL1_BYPASS,
-	       imx_clk_mux_flags("video_pll1_bypass", base + 0x28, 16, 1,
-				 video_pll1_bypass_sels,
-				 ARRAY_SIZE(video_pll1_bypass_sels),
-				 CLK_SET_RATE_PARENT));
 	clk_dm(IMX8MM_DRAM_PLL_BYPASS,
 	       imx_clk_mux_flags("dram_pll_bypass", base + 0x50, 4, 1,
 				 dram_pll_bypass_sels,
@@ -226,9 +174,6 @@ static int imx8mm_clk_probe(struct udevice *dev)
 				 CLK_SET_RATE_PARENT));
 
 	/* PLL out gate */
-	clk_dm(IMX8MM_VIDEO_PLL1_OUT,
-	       imx_clk_gate("video_pll1_out", "video_pll1_bypass",
-			    base + 0x28, 13));
 	clk_dm(IMX8MM_DRAM_PLL_OUT,
 	       imx_clk_gate("dram_pll_out", "dram_pll_bypass",
 			    base + 0x50, 13));
@@ -308,11 +253,9 @@ static int imx8mm_clk_probe(struct udevice *dev)
 					    imx8mm_nand_usdhc_sels,
 					    base + 0x8900));
 	clk_dm(IMX8MM_CLK_USB_BUS,
-		imx8m_clk_composite("usb_bus", imx8mm_usb_bus_sels, base + 0x8b80));
+		imx8m_clk_composite_critical("usb_bus", imx8mm_usb_bus_sels, base + 0x8b80));
 
 	/* IP */
-	clk_dm(IMX8MM_CLK_NAND,
-	       imx8m_clk_composite("nand", imx8mm_nand_sels, base + 0xab00));
 	clk_dm(IMX8MM_CLK_USDHC1,
 	       imx8m_clk_composite("usdhc1", imx8mm_usdhc1_sels,
 				   base + 0xac00));
@@ -360,39 +303,9 @@ static int imx8mm_clk_probe(struct udevice *dev)
 	       imx_clk_gate4("usdhc3_root_clk", "usdhc3", base + 0x45e0, 0));
 	clk_dm(IMX8MM_CLK_USB1_CTRL_ROOT,
 		imx_clk_gate4("usb1_ctrl_root_clk", "usb_bus", base + 0x44d0, 0));
-	clk_dm(IMX8MM_CLK_NAND_ROOT,
-	       imx_clk_gate2_shared2("nand_root_clk", "nand", base + 0x4300, 0, &share_count_nand));
-	clk_dm(IMX8MM_CLK_NAND_USDHC_BUS_RAWNAND_CLK,
-	       imx_clk_gate2_shared2("nand_usdhc_rawnand_clk", "nand_usdhc_bus", base + 0x4300, 0, &share_count_nand));
 
 	/* clks not needed in SPL stage */
 #ifndef CONFIG_SPL_BUILD
-	clk_dm(IMX8MM_CLK_DISP_AXI,
-	       imx8m_clk_composite("disp_axi", imx8mm_disp_axi_sels, base + 0x8a00));
-	clk_dm(IMX8MM_CLK_DISP_APB,
-	       imx8m_clk_composite("disp_apb", imx8mm_disp_apb_sels, base + 0x8a80));
-	clk_dm(IMX8MM_CLK_LCDIF_PIXEL,
-	       imx8m_clk_composite("lcdif_pixel", imx8mm_lcdif_pixel_sels, base + 0xa500));
-	clk_dm(IMX8MM_CLK_DISP_RTRM,
-	       imx8m_clk_composite("disp_rtrm", imx8mm_disp_rtrm_sels, base + 0x8b00));
-	clk_dm(IMX8MM_CLK_DISP_DC8000,
-	       imx8m_clk_composite("disp_dc8000", imx8mm_disp_dc8000_sels, base + 0xa280));
-	clk_dm(IMX8MM_CLK_DSI_CORE,
-	       imx8m_clk_composite("dsi_core", imx8mm_dsi_core_sels, base + 0xbb00));
-	clk_dm(IMX8MM_CLK_DSI_PHY_REF,
-	       imx8m_clk_composite("dsi_phy_ref", imx8mm_dsi_phy_sels, base + 0xbb80));
-	clk_dm(IMX8MM_CLK_DSI_DBI,
-	       imx8m_clk_composite("dsi_dbi", imx8mm_dsi_dbi_sels, base + 0xbc00));
-
-	clk_dm(IMX8MM_CLK_DISP_ROOT,
-	       imx_clk_gate2_shared2("disp_root_clk", "disp_dc8000", base + 0x45d0, 0, &share_count_disp));
-	clk_dm(IMX8MM_CLK_DISP_AXI_ROOT,
-	       imx_clk_gate2_shared2("disp_axi_root_clk", "disp_axi", base + 0x45d0, 0, &share_count_disp));
-	clk_dm(IMX8MM_CLK_DISP_APB_ROOT,
-	       imx_clk_gate2_shared2("disp_apb_root_clk", "disp_apb", base + 0x45d0, 0, &share_count_disp));
-	clk_dm(IMX8MM_CLK_DISP_RTRM_ROOT,
-	       imx_clk_gate2_shared2("disp_rtrm_root_clk", "disp_rtrm", base + 0x45d0, 0, &share_count_disp));
-
 	clk_dm(IMX8MM_CLK_ENET_AXI,
 	       imx8m_clk_composite("enet_axi", imx8mm_enet_axi_sels,
 				   base + 0x8880));

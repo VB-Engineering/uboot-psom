@@ -1,0 +1,15 @@
+if TARGET_CONSOLINNO_1U0025
+
+config SYS_BOARD
+	string
+	default "1u0025"
+
+config SYS_VENDOR
+	string
+	default "consolinno"
+
+config SYS_CONFIG_NAME
+	string
+	default "consolinno-1u0025"
+
+endif
